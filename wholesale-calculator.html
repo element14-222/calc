@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barreletics Wholesale Pricing — Deal Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Serif+Text&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'DM Sans', system-ui, sans-serif; background: #faf9f7; color: #1a1917; min-height: 100vh; }
+    .br-wholesale-calc { --bg:#faf9f7; --surface:#fff; --border:#e5e2de; --text:#1a1917; --text-muted:#6b6560; --accent:#2d4a3e; --accent-light:#e8f0ed; --sweet:#1e7a5e; --ok:#5c8a6f; --floor:#b8860b; --nogo:#c44d4d; background:var(--bg); padding:2rem 1.5rem; min-height:100vh; font-family:'DM Sans',system-ui,sans-serif; }
+    .br-wholesale-calc *{box-sizing:border-box}
+    .br-wholesale-calc .container{max-width:1100px;margin:0 auto}
+    .br-wholesale-calc h1{font-family:'DM Serif Text',Georgia,serif;font-size:1.75rem;font-weight:400;color:var(--accent);margin:0 0 0.25rem 0}
+    .br-wholesale-calc .subtitle{font-size:0.9rem;color:var(--text-muted);margin-bottom:2rem}
+    .br-wholesale-calc .grid{display:grid;gap:1.5rem}
+    @media(min-width:900px){.br-wholesale-calc .grid{grid-template-columns:1fr 1fr}}
+    .br-wholesale-calc .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+    .br-wholesale-calc .card h2{font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin:0 0 1rem 0}
+    .br-wholesale-calc .form-group{margin-bottom:1rem}
+    .br-wholesale-calc label{display:block;font-size:0.8rem;font-weight:500;color:var(--text-muted);margin-bottom:0.35rem}
+    .br-wholesale-calc select,.br-wholesale-calc input[type="number"],.br-wholesale-calc input[type="text"]{width:100%;padding:0.6rem 0.75rem;font-size:0.95rem;font-family:inherit;border:1px solid var(--border);border-radius:8px}
+    .br-wholesale-calc .inline-row{display:flex;gap:0.75rem;align-items:flex-end}
+    .br-wholesale-calc .inline-row .form-group{flex:1;margin-bottom:0}
+    .br-wholesale-calc .results{display:grid;gap:1rem}
+    .br-wholesale-calc .result-row{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:var(--bg);border-radius:8px;font-size:0.95rem}
+    .br-wholesale-calc .result-row .label{color:var(--text-muted)}
+    .br-wholesale-calc .result-row .value{font-weight:600}
+    .br-wholesale-calc .status{display:inline-flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;border-radius:8px;font-weight:600;font-size:0.95rem}
+    .br-wholesale-calc .status.sweet{background:#d4ede5;color:var(--sweet)}
+    .br-wholesale-calc .status.ok{background:#e2efe6;color:var(--ok)}
+    .br-wholesale-calc .status.floor{background:#f5edd9;color:#8b6914}
+    .br-wholesale-calc .status.nogo{background:#fce8e8;color:var(--nogo)}
+    .br-wholesale-calc .status.empty{background:var(--border);color:var(--text-muted)}
+    .br-wholesale-calc .summary-section{margin-top:2rem}
+    .br-wholesale-calc .summary-section h2{font-size:1rem;font-weight:600;color:var(--accent);margin:0 0 1rem 0}
+    .br-wholesale-calc .tier-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+    .br-wholesale-calc .tier-table th,.br-wholesale-calc .tier-table td{padding:0.5rem 0.75rem;text-align:left;border-bottom:1px solid var(--border)}
+    .br-wholesale-calc .tier-table th{font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase}
+    .br-wholesale-calc .tier-table tr:hover{background:var(--bg)}
+    .br-wholesale-calc .tier-table .wp{font-weight:600}
+    .br-wholesale-calc .accordion{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:0.5rem}
+    .br-wholesale-calc .accordion-header{padding:0.75rem 1rem;background:var(--surface);cursor:pointer;font-weight:600;font-size:0.9rem;display:flex;justify-content:space-between}
+    .br-wholesale-calc .accordion-header:hover{background:var(--bg)}
+    .br-wholesale-calc .accordion-header::after{content:'▼';font-size:0.65rem;color:var(--text-muted)}
+    .br-wholesale-calc .accordion.open .accordion-header::after{transform:rotate(180deg)}
+    .br-wholesale-calc .accordion-body{display:none;padding:1rem;background:var(--bg);border-top:1px solid var(--border)}
+    .br-wholesale-calc .accordion.open .accordion-body{display:block}
+    .br-wholesale-calc .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.25rem;font-size:0.9rem;font-family:inherit;font-weight:500;border:none;border-radius:8px;cursor:pointer;background:var(--accent);color:#fff}
+    .br-wholesale-calc .btn:hover{background:#233d32}
+    .br-wholesale-calc .btn.secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+    .br-wholesale-calc .btn.secondary:hover{background:var(--bg)}
+    .br-wholesale-calc .actions{margin-top:1rem;display:flex;gap:0.75rem;flex-wrap:wrap}
+    .br-wholesale-calc .cost-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem}
+    .br-wholesale-calc .cost-grid .form-group{margin-bottom:0}
+    .br-wholesale-calc .collapsible-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:0.5rem 0;font-weight:500;font-size:0.9rem;color:var(--text-muted)}
+    .br-wholesale-calc .collapsible-header:hover{color:var(--text)}
+    .br-wholesale-calc .collapsible-body{display:none;padding-top:1rem}
+    .br-wholesale-calc .collapsible-body.open{display:block}
+    .br-wholesale-calc .status-key-btn{margin-top:0.75rem;padding:0.35rem 0;font-size:0.8rem;color:var(--text-muted);background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:underline}
+    .br-wholesale-calc .status-key{display:none;margin-top:0.5rem;padding:0.75rem 1rem;font-size:0.8rem;color:var(--text-muted);background:var(--bg);border-radius:8px;line-height:1.6}
+    .br-wholesale-calc .status-key.open{display:block}
+    .br-wholesale-calc .status-key .sk{font-weight:600}
+    .br-wholesale-calc .gate-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:99999}
+    .br-wholesale-calc .gate-overlay.hidden{display:none}
+    .br-wholesale-calc .gate-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2rem;max-width:320px;box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+    .br-wholesale-calc .gate-box h2{font-family:'DM Serif Text',Georgia,serif;font-size:1.25rem;color:var(--accent);margin:0 0 0.5rem 0}
+    .br-wholesale-calc .gate-box p{font-size:0.9rem;color:var(--text-muted);margin:0 0 1.25rem 0}
+    .br-wholesale-calc .gate-box input{margin-bottom:1rem;width:100%}
+    .br-wholesale-calc .gate-box .error{font-size:0.85rem;color:var(--nogo);margin-top:-0.5rem;margin-bottom:0.5rem}
+  </style>
+</head>
+<body>
+<div class="br-wholesale-calc">
+  <div class="gate-overlay" id="br-gate">
+    <div class="gate-box">
+      <h2>Barreletics Wholesale</h2>
+      <p>Enter username and password to access the calculator.</p>
+      <input type="text" id="br-gate-user" placeholder="Username" autocomplete="username">
+      <input type="password" id="br-gate-pw" placeholder="Password" autocomplete="current-password">
+      <p class="error" id="br-gate-error" style="display:none">Incorrect username or password.</p>
+      <button type="button" class="btn" id="br-gate-btn">Access</button>
+    </div>
+  </div>
+  <div class="container" id="br-main-content" style="display:none">
+    <h1>Barreletics Wholesale Pricing</h1>
+    <p class="subtitle">Deal calculator — adjust inputs, pick tier, see margins. Export for proposals.</p>
+    <div class="grid">
+      <div class="card">
+        <h2>Inputs</h2>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="br-category">
+            <option value="">— Select category —</option>
+            <option value="Affiliate / Studio Amb.">Affiliate / Studio Ambassador</option>
+            <option value="Wholesaler">Wholesaler</option>
+            <option value="Big Box — Stock">Big Box — Stock</option>
+            <option value="Big Box — Co-op">Big Box — Co-op</option>
+            <option value="Distributor NA">Distributor NA</option>
+            <option value="Distributor EU">Distributor EU</option>
+            <option value="Internal Scale">Internal Scale</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tier</label>
+          <select id="br-tier"><option value="">— Select tier —</option></select>
+        </div>
+        <div class="inline-row">
+          <div class="form-group">
+            <label>Order qty</label>
+            <input type="number" id="br-qty" min="1" placeholder="MOQ">
+          </div>
+          <div class="form-group">
+            <label>Wholesale price $</label>
+            <input type="number" id="br-wp" min="0" step="0.01" placeholder="Override">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Shipping</label>
+          <select id="br-shipping">
+            <option value="FOB">FOB (partner pays)</option>
+            <option value="Brand Pays">Brand pays</option>
+          </select>
+        </div>
+        <div class="collapsible-header" data-br-toggle="add-tier">
+          <span>Add custom tier (this session)</span>
+          <span id="br-add-tier-toggle">▶</span>
+        </div>
+        <div class="collapsible-body" id="br-add-tier-panel">
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.75rem">Add a one-off tier. Resets when you reload.</p>
+          <div class="inline-row" style="margin-bottom:0.5rem">
+            <div class="form-group"><label>Tier name</label><input type="text" id="br-custom-name" placeholder="e.g. Custom (60-74)"></div>
+            <div class="form-group"><label>MOQ</label><input type="number" id="br-custom-moq" min="1" placeholder="50"></div>
+            <div class="form-group"><label>Wholesale $</label><input type="number" id="br-custom-wp" min="0" step="0.01" placeholder="49.00"></div>
+          </div>
+          <button type="button" class="btn secondary" id="br-add-tier-btn">Add tier</button>
+        </div>
+        <div class="collapsible-header" data-br-toggle="costs">
+          <span>Costs &amp; guardrails</span>
+          <span id="br-costs-toggle">▶</span>
+        </div>
+        <div class="collapsible-body" id="br-costs-panel">
+          <div class="cost-grid">
+            <div class="form-group"><label>Base cost $</label><input type="number" id="br-baseCost" value="7.75"></div>
+            <div class="form-group"><label>Co-op add $</label><input type="number" id="br-coopAdd" value="1.00"></div>
+            <div class="form-group"><label>Custom add $</label><input type="number" id="br-customAdd" value="1.00"></div>
+            <div class="form-group"><label>Shipping $/unit</label><input type="number" id="br-shipCost" value="0.73"></div>
+            <div class="form-group"><label>MSRP $</label><input type="number" id="br-msrp" value="74"></div>
+            <div class="form-group"><label>Sweet %</label><input type="number" id="br-sweet" value="78"></div>
+            <div class="form-group"><label>OK %</label><input type="number" id="br-ok" value="72"></div>
+            <div class="form-group"><label>Floor %</label><input type="number" id="br-floor" value="68"></div>
+            <div class="form-group"><label></label><button type="button" class="btn secondary" id="br-reset-costs">Reset</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Results</h2>
+        <div class="results">
+          <div class="result-row"><span class="label">Wholesale price</span><span class="value" id="br-res-wp">—</span></div>
+          <div class="result-row"><span class="label">Partner margin %</span><span class="value" id="br-res-partner-pct">—</span></div>
+          <div class="result-row"><span class="label">Partner $ / unit</span><span class="value" id="br-res-partner-dollar">—</span></div>
+          <div class="result-row"><span class="label">Our net margin %</span><span class="value" id="br-res-our-pct">—</span></div>
+          <div class="result-row"><span class="label">Our net $ / unit</span><span class="value" id="br-res-our-dollar">—</span></div>
+          <div class="result-row"><span class="label">Total order profit</span><span class="value" id="br-res-total">—</span></div>
+          <div class="result-row"><span class="label">Status</span><span id="br-res-status" class="status empty">—</span></div>
+        </div>
+        <button type="button" class="status-key-btn" id="br-status-key-btn">What do these mean?</button>
+        <div class="status-key" id="br-status-key">
+          <span class="sk sweet">Sweet Spot</span> — Ideal margin. &nbsp;
+          <span class="sk ok">OK</span> — Negotiation zone. &nbsp;
+          <span class="sk floor">Floor Risk</span> — Requires commitment. &nbsp;
+          <span class="sk nogo">NO GO</span> — Not permitted.
+        </div>
+        <div class="actions"><button type="button" class="btn" id="br-copy-btn">Copy for proposal</button></div>
+      </div>
+    </div>
+    <div class="summary-section">
+      <h2>Recommended ranges by category</h2>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem">Click a category to expand.</p>
+      <div id="br-summary-accordions"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+var TIERS=[{cat:"Affiliate / Studio Amb.",tier:"Starter (12-19)",moq:12,wp:55.5,costType:"stock",ship:false},{cat:"Affiliate / Studio Amb.",tier:"Growth (20-24)",moq:20,wp:52,costType:"stock",ship:true},{cat:"Affiliate / Studio Amb.",tier:"Growth Plus (25-34)",moq:25,wp:51,costType:"stock",ship:true},{cat:"Affiliate / Studio Amb.",tier:"Growth Pro (35-49)",moq:35,wp:50,costType:"stock",ship:true},{cat:"Affiliate / Studio Amb.",tier:"Ambassador (50-74)",moq:50,wp:48.5,costType:"stock",ship:true},{cat:"Affiliate / Studio Amb.",tier:"Ambassador Plus (75-99)",moq:75,wp:47.25,costType:"stock",ship:true},{cat:"Affiliate / Studio Amb.",tier:"Elite (100+)",moq:100,wp:46,costType:"stock",ship:true},{cat:"Wholesaler",tier:"Standard Boutique",moq:50,wp:40.7,costType:"stock",ship:false},{cat:"Big Box — Stock",tier:"Current (300)",moq:300,wp:37,costType:"stock",ship:true},{cat:"Big Box — Stock",tier:"Baseline (500)",moq:500,wp:34,costType:"stock",ship:true},{cat:"Big Box — Stock",tier:"Growth (1,000)",moq:1000,wp:31,costType:"stock",ship:true},{cat:"Big Box — Stock",tier:"Strategic (2,000+)",moq:2000,wp:29.6,costType:"stock",ship:true},{cat:"Big Box — Co-op",tier:"Baseline (500)",moq:500,wp:36,costType:"coop",ship:false},{cat:"Big Box — Co-op",tier:"Growth (1,000)",moq:1000,wp:33,costType:"coop",ship:false},{cat:"Big Box — Co-op",tier:"Strategic (1,500)",moq:1500,wp:31.5,costType:"coop",ship:false},{cat:"Big Box — Co-op",tier:"Premium (2,000+)",moq:2000,wp:30.5,costType:"coop",ship:false},{cat:"Distributor NA",tier:"Starter (200-499)",moq:200,wp:29,costType:"stock",ship:false},{cat:"Distributor NA",tier:"Growth (500-999)",moq:500,wp:27.5,costType:"stock",ship:false},{cat:"Distributor NA",tier:"Volume (1000-1999)",moq:1000,wp:26.5,costType:"stock",ship:false},{cat:"Distributor NA",tier:"Strategic (2,000+)",moq:2000,wp:26,costType:"stock",ship:false},{cat:"Distributor EU",tier:"Launch (500)",moq:500,wp:30,costType:"custom",ship:false},{cat:"Distributor EU",tier:"Established (1,000)",moq:1000,wp:27.5,costType:"custom",ship:false},{cat:"Distributor EU",tier:"Growth (2,000)",moq:2000,wp:25.5,costType:"custom",ship:false},{cat:"Distributor EU",tier:"Strategic (3,000+)",moq:3000,wp:24,costType:"custom",ship:false},{cat:"Internal Scale",tier:"Scale (3,000)",moq:3000,wp:28.5,costType:"stock",ship:true},{cat:"Internal Scale",tier:"Scale (5,000)",moq:5000,wp:27.75,costType:"stock",ship:true}];
+var sessionTiers=[];
+var USER='barreletics';
+var PASS='barreletics8';
+var $=function(id){return document.getElementById(id)};
+function getCost(t){var b=parseFloat($('br-baseCost').value)||7.75,c=parseFloat($('br-coopAdd').value)||1,x=parseFloat($('br-customAdd').value)||1;if(t.costType==='stock')return b;if(t.costType==='coop')return b+c;return b+c+x;}
+function getShip(){return $('br-shipping').value==='Brand Pays'?(parseFloat($('br-shipCost').value)||0.73):0;}
+function getShipApplies(t){if($('br-shipping').value!=='Brand Pays')return 0;return t.ship?(parseFloat($('br-shipCost').value)||0.73):0;}
+function getStatus(m){var s=(parseFloat($('br-sweet').value)||78)/100,o=(parseFloat($('br-ok').value)||72)/100,f=(parseFloat($('br-floor').value)||68)/100;if(m>=s)return{label:'Sweet Spot',cls:'sweet'};if(m>=o)return{label:'OK',cls:'ok'};if(m>=f)return{label:'Floor Risk',cls:'floor'};return{label:'NO GO',cls:'nogo'};}
+function fm(n){return(n==null||isNaN(n))?'—':'$'+Number(n).toFixed(2);}
+function fp(n){return(n==null||isNaN(n))?'—':(n*100).toFixed(1)+'%';}
+function allTiers(){return TIERS.concat(sessionTiers);}
+function populate(){var cat=$('br-category').value,sel=$('br-tier');sel.innerHTML='<option value="">— Select tier —</option>';allTiers().filter(function(t){return t.cat===cat}).forEach(function(t,i){var o=document.createElement('option');o.value=i;o.textContent=t.tier+' — MOQ '+t.moq.toLocaleString()+' @ '+fm(t.wp)+(t.custom?' (custom)':'');sel.appendChild(o);});$('br-qty').value='';$('br-wp').value='';selectedTier=null;recalc();}
+var selectedTier=null;
+function onSelect(){var cat=$('br-category').value,idx=$('br-tier').value;if(idx===''){selectedTier=null;recalc();return;}var f=allTiers().filter(function(t){return t.cat===cat});selectedTier=f[parseInt(idx)];$('br-qty').value=selectedTier.moq;$('br-wp').value=selectedTier.wp;recalc();}
+function recalc(){var q=parseInt($('br-qty').value)||0,wo=parseFloat($('br-wp').value),msrp=parseFloat($('br-msrp').value)||74,res=function(id,v){var e=$(id);if(e)e.textContent=v;},se=$('br-res-status');if(!selectedTier&&!wo){res('br-res-wp','—');res('br-res-partner-pct','—');res('br-res-partner-dollar','—');res('br-res-our-pct','—');res('br-res-our-dollar','—');res('br-res-total','—');se.textContent='—';se.className='status empty';return;}
+var wp=(wo&&wo>0)?wo:(selectedTier?selectedTier.wp:0),cost=selectedTier?getCost(selectedTier):(parseFloat($('br-baseCost').value)||7.75),ship=selectedTier?getShipApplies(selectedTier):getShip(),net=cost+ship;
+var pp=(msrp-wp)/msrp,pd=msrp-wp,op=(wp-net)/wp,od=wp-net,tot=od*(q||0),st=getStatus(op);
+res('br-res-wp',fm(wp));res('br-res-partner-pct',fp(pp));res('br-res-partner-dollar',fm(pd));res('br-res-our-pct',fp(op));res('br-res-our-dollar',fm(od));res('br-res-total',fm(tot));se.textContent=st.label;se.className='status '+st.cls;}
+function buildSummary(){var all=allTiers(),cats=[],c={};all.forEach(function(t){if(!c[t.cat]){c[t.cat]=1;cats.push(t.cat);}});var cnt=$('br-summary-accordions');cnt.innerHTML='';cats.forEach(function(cat){var items=all.filter(function(t){return t.cat===cat}),div=document.createElement('div');div.className='accordion';var tbl='<table class="tier-table"><thead><tr><th>Tier</th><th>MOQ</th><th>WP</th><th>Partner %</th><th>Our Net %</th></tr></thead><tbody>';items.forEach(function(t){var cos=getCost(t),sh=t.ship?0.73:0,nc=cos+sh,op=(t.wp-nc)/t.wp,pp=(74-t.wp)/74;tbl+='<tr><td>'+t.tier+'</td><td>'+t.moq.toLocaleString()+'</td><td class="wp">'+fm(t.wp)+'</td><td>'+fp(pp)+'</td><td>'+fp(op)+'</td></tr>';});tbl+='</tbody></table>';div.innerHTML='<div class="accordion-header">'+cat+'</div><div class="accordion-body">'+tbl+'</div>';div.querySelector('.accordion-header').addEventListener('click',function(){div.classList.toggle('open');});cnt.appendChild(div);});}
+function gate(){if(sessionStorage.getItem('br_calc')==='1'){$('br-gate').classList.add('hidden');$('br-main-content').style.display='block';return;}function tryUnlock(){if(($('br-gate-user').value||'').trim()===USER&&$('br-gate-pw').value===PASS){sessionStorage.setItem('br_calc','1');$('br-gate-error').style.display='none';$('br-gate').classList.add('hidden');$('br-main-content').style.display='block';}else{$('br-gate-error').style.display='block';}}$('br-gate-btn').addEventListener('click',tryUnlock);['br-gate-user','br-gate-pw'].forEach(function(id){var el=$(id);if(el)el.addEventListener('keydown',function(e){if(e.key==='Enter')tryUnlock();});});}
+$('br-category').addEventListener('change',populate);
+$('br-tier').addEventListener('change',onSelect);
+['br-qty','br-wp','br-baseCost','br-coopAdd','br-customAdd','br-shipCost','br-msrp','br-sweet','br-ok','br-floor'].forEach(function(id){var el=$(id);if(el)el.addEventListener('input',recalc);});
+$('br-shipping').addEventListener('change',recalc);
+$('br-add-tier-btn').addEventListener('click',function(){var cat=$('br-category').value,n=($('br-custom-name').value||'').trim(),moq=parseInt($('br-custom-moq').value)||0,wp=parseFloat($('br-custom-wp').value)||0;if(!cat){alert('Select category first');return;}if(!n||moq<1||wp<=0){alert('Fill in tier name, MOQ, and wholesale price');return;}sessionTiers.push({cat:cat,tier:n,moq:moq,wp:wp,costType:'stock',ship:true,custom:true});$('br-custom-name').value='';$('br-custom-moq').value='';$('br-custom-wp').value='';populate();});
+document.querySelectorAll('[data-br-toggle="add-tier"]').forEach(function(el){el.addEventListener('click',function(){var p=$('br-add-tier-panel'),t=$('br-add-tier-toggle');p.classList.toggle('open');t.textContent=p.classList.contains('open')?'▼':'▶';});});
+document.querySelectorAll('[data-br-toggle="costs"]').forEach(function(el){el.addEventListener('click',function(){var p=$('br-costs-panel'),t=$('br-costs-toggle');p.classList.toggle('open');t.textContent=p.classList.contains('open')?'▼':'▶';});});
+$('br-reset-costs').addEventListener('click',function(){$('br-baseCost').value=7.75;$('br-coopAdd').value=1;$('br-customAdd').value=1;$('br-shipCost').value=0.73;$('br-msrp').value=74;$('br-sweet').value=78;$('br-ok').value=72;$('br-floor').value=68;recalc();});
+$('br-status-key-btn').addEventListener('click',function(){$('br-status-key').classList.toggle('open');});
+$('br-copy-btn').addEventListener('click',function(){var cat=$('br-category').value,txt=($('br-tier').options[$('br-tier').selectedIndex]||{}).text||'',wp=$('br-res-wp').textContent,pp=$('br-res-partner-pct').textContent,op=$('br-res-our-pct').textContent,q=$('br-qty').value;if(!cat||!txt||wp==='—'){alert('Select category and tier first');return;}var lines=['BARRELECTICS WHOLESALE PRICING','───────────────────────────────','Category: '+cat,'Tier: '+txt,'Order Qty: '+(q||'—'),'Wholesale Price: '+wp,'Partner Margin: '+pp,'Barreletics Net: '+op,'','MSRP: $74'];navigator.clipboard.writeText(lines.join('\n')).then(function(){var b=$('br-copy-btn');var o=b.textContent;b.textContent='Copied!';setTimeout(function(){b.textContent=o;},2000);}).catch(function(){alert('Could not copy');});});
+gate();
+populate();
+buildSummary();
+})();
+</script>
+</body>
+</html>
