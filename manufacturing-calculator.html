@@ -273,8 +273,12 @@
             <input type="number" id="mfg-ship-cost" min="0" step="0.01" value="0.23">
           </div>
           <div class="form-group">
-            <label>Packaging ($/pair)</label>
+            <label>Mesh bag ($/pair)</label>
             <input type="number" id="mfg-packaging" min="0" step="0.01" value="0.56">
+          </div>
+          <div class="form-group">
+            <label>Box ($/pair)</label>
+            <input type="number" id="mfg-box" min="0" step="0.01" value="0.60">
           </div>
           <div class="form-group">
             <label>Colorant ($/lb)</label>
@@ -339,7 +343,7 @@
         </div>
         <div class="formula">
           Brand margin % = (Sell-in price − Landed cost) / Sell-in price. <br>
-          Landed cost = Base + Packaging + Colorant + Shipping + Scenario add (+ plate fee spread if brand pays). <br>
+          Landed cost = Base + Mesh bag + Box + Colorant + Shipping + Scenario add (+ plate fee spread if brand pays). <br>
           Colorant/pair = 0.388 lbs × let-down % × $/lb (based on Large pair weight). <br>
           Shipping default: ~$350/pallet ÷ ~1,500 pairs = $0.23/pair.
         </div>
@@ -391,6 +395,7 @@
     var baseCost = Math.max(0, asNum("mfg-base-cost", 5.09));
     var shipCost = Math.max(0, asNum("mfg-ship-cost", 0.23));
     var packaging = Math.max(0, asNum("mfg-packaging", 0.56));
+    var box = Math.max(0, asNum("mfg-box", 0.60));
     var colorantPerLb = Math.max(0, asNum("mfg-colorant-cost", 20));
     var colorantPct = Math.max(0, Math.min(100, asNum("mfg-colorant-pct", 4))) / 100;
     var coopAdd = Math.max(0, asNum("mfg-coop-add", 1));
@@ -407,7 +412,7 @@
     if (scenario === "coop") scenarioAdd = coopAdd;
     if (scenario === "custom") scenarioAdd = coopAdd + customAdd;
 
-    var landedPerUnit = baseCost + shipCost + packaging + colorantPerPair + scenarioAdd;
+    var landedPerUnit = baseCost + shipCost + packaging + box + colorantPerPair + scenarioAdd;
     var plateCostApplied = partnerPaysPlate ? 0 : plateFee;
     var platePerUnit = plateCostApplied / qty;
     var landedWithPlatePerUnit = landedPerUnit + platePerUnit;
@@ -458,6 +463,7 @@
     $("mfg-base-cost").value = "5.09";
     $("mfg-ship-cost").value = "0.23";
     $("mfg-packaging").value = "0.56";
+    $("mfg-box").value = "0.60";
     $("mfg-colorant-cost").value = "20.00";
     $("mfg-colorant-pct").value = "4";
     $("mfg-coop-add").value = "1.00";
@@ -519,7 +525,7 @@
   gate();
   resetDefaults();
 
-  ["mfg-scenario", "mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-packaging", "mfg-colorant-cost", "mfg-colorant-pct", "mfg-coop-add", "mfg-custom-add", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
+  ["mfg-scenario", "mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-packaging", "mfg-box", "mfg-colorant-cost", "mfg-colorant-pct", "mfg-coop-add", "mfg-custom-add", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
     .forEach(function (id) {
       $(id).addEventListener("input", function () {
         recalc();
