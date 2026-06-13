@@ -273,6 +273,14 @@
             <input type="number" id="mfg-ship-cost" min="0" step="0.01" value="0.23">
           </div>
           <div class="form-group">
+            <label>Colorant ($/lb)</label>
+            <input type="number" id="mfg-colorant-cost" min="0" step="0.01" value="20.00">
+          </div>
+          <div class="form-group">
+            <label>Colorant let-down %</label>
+            <input type="number" id="mfg-colorant-pct" min="0" max="100" step="0.1" value="4">
+          </div>
+          <div class="form-group">
             <label>Co-op add ($)</label>
             <input type="number" id="mfg-coop-add" min="0" step="0.01" value="1.00">
           </div>
@@ -306,6 +314,7 @@
 
       <div class="card">
         <h2>Results</h2>
+        <div class="result-row"><span class="label">Colorant cost / pair</span><span class="value" id="mfg-res-colorant-pair">—</span></div>
         <div class="result-row"><span class="label">Landed cost / unit</span><span class="value" id="mfg-res-unit-cost">—</span></div>
         <div class="result-row"><span class="label">Gross profit / unit</span><span class="value" id="mfg-res-profit-unit">—</span></div>
         <div class="result-row"><span class="label">Brand gross margin %</span><span class="value" id="mfg-res-margin">—</span></div>
@@ -326,7 +335,8 @@
         </div>
         <div class="formula">
           Brand margin % = (Sell-in price − Landed cost) / Sell-in price. <br>
-          Landed cost = Base + Shipping + Scenario add (+ plate fee spread if brand pays). <br>
+          Landed cost = Base + Colorant + Shipping + Scenario add (+ plate fee spread if brand pays). <br>
+          Colorant/pair = 0.388 lbs × let-down % × $/lb (based on Large pair weight). <br>
           Shipping default: ~$350/pallet ÷ ~1,500 pairs = $0.23/pair.
         </div>
       </div>
@@ -367,13 +377,17 @@
     return { label: "NO GO", cls: "nogo" };
   }
 
+  var BASE_LBS_LARGE = 0.388;
+
   function recalc() {
     var scenario = $("mfg-scenario").value;
     var qty = Math.max(1, asInt("mfg-qty", 1));
     var price = Math.max(0, asNum("mfg-price", 0));
     var msrp = Math.max(0, asNum("mfg-msrp", 74));
-    var baseCost = Math.max(0, asNum("mfg-base-cost", 8));
-    var shipCost = Math.max(0, asNum("mfg-ship-cost", 0.73));
+    var baseCost = Math.max(0, asNum("mfg-base-cost", 5.09));
+    var shipCost = Math.max(0, asNum("mfg-ship-cost", 0.23));
+    var colorantPerLb = Math.max(0, asNum("mfg-colorant-cost", 20));
+    var colorantPct = Math.max(0, Math.min(100, asNum("mfg-colorant-pct", 4))) / 100;
     var coopAdd = Math.max(0, asNum("mfg-coop-add", 1));
     var customAdd = Math.max(0, asNum("mfg-custom-add", 1));
     var plateFee = Math.max(0, asNum("mfg-plate-fee", 1000));
@@ -382,11 +396,13 @@
     var ok = Math.max(0.01, Math.min(0.99, asNum("mfg-ok", 72) / 100));
     var floor = Math.max(0.01, Math.min(0.99, asNum("mfg-floor", 68) / 100));
 
+    var colorantPerPair = BASE_LBS_LARGE * colorantPct * colorantPerLb;
+
     var scenarioAdd = 0;
     if (scenario === "coop") scenarioAdd = coopAdd;
     if (scenario === "custom") scenarioAdd = coopAdd + customAdd;
 
-    var landedPerUnit = baseCost + shipCost + scenarioAdd;
+    var landedPerUnit = baseCost + shipCost + colorantPerPair + scenarioAdd;
     var plateCostApplied = partnerPaysPlate ? 0 : plateFee;
     var platePerUnit = plateCostApplied / qty;
     var landedWithPlatePerUnit = landedPerUnit + platePerUnit;
@@ -405,6 +421,7 @@
     var okPrice = safeTargetPrice(landedWithPlatePerUnit, ok);
     var floorPrice = safeTargetPrice(landedWithPlatePerUnit, floor);
 
+    $("mfg-res-colorant-pair").textContent = money(colorantPerPair);
     $("mfg-res-unit-cost").textContent = money(landedWithPlatePerUnit);
     $("mfg-res-profit-unit").textContent = money(profitPerUnit);
     $("mfg-res-margin").textContent = pct(brandMargin);
@@ -435,6 +452,8 @@
     $("mfg-msrp").value = "74.00";
     $("mfg-base-cost").value = "5.09";
     $("mfg-ship-cost").value = "0.23";
+    $("mfg-colorant-cost").value = "20.00";
+    $("mfg-colorant-pct").value = "4";
     $("mfg-coop-add").value = "1.00";
     $("mfg-custom-add").value = "1.00";
     $("mfg-plate-fee").value = "1000";
@@ -452,6 +471,7 @@
       "Scenario: " + $("mfg-scenario").value.toUpperCase(),
       "Order Qty: " + (asInt("mfg-qty", 0)).toLocaleString(),
       "Sell-in price: " + $("mfg-price").value,
+      "Colorant Cost / Pair: " + $("mfg-res-colorant-pair").textContent,
       "Landed Cost / Unit: " + $("mfg-res-unit-cost").textContent,
       "Gross Profit / Unit: " + $("mfg-res-profit-unit").textContent,
       "Brand Gross Margin: " + $("mfg-res-margin").textContent,
@@ -493,7 +513,7 @@
   gate();
   resetDefaults();
 
-  ["mfg-scenario", "mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-coop-add", "mfg-custom-add", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
+  ["mfg-scenario", "mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-colorant-cost", "mfg-colorant-pct", "mfg-coop-add", "mfg-custom-add", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
     .forEach(function (id) {
       $(id).addEventListener("input", function () {
         recalc();
