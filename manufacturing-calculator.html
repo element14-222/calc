@@ -281,6 +281,10 @@
             <input type="number" id="mfg-box" min="0" step="0.01" value="0.60">
           </div>
           <div class="form-group">
+            <label>TPE resin ($/pair)</label>
+            <input type="number" id="mfg-tpe-resin" min="0" step="0.01" value="1.01">
+          </div>
+          <div class="form-group">
             <label>Colorant ($/lb)</label>
             <input type="number" id="mfg-colorant-cost" min="0" step="0.01" value="20.00">
           </div>
@@ -344,10 +348,11 @@
         <div class="formula">
           <strong>How we calculate</strong><br><br>
           <strong>Brand margin %</strong> = (Sell-in price − Landed cost) / Sell-in price.<br><br>
-          <strong>Landed cost</strong> = Base mfg + Mesh bag + Box + Colorant + Shipping + Scenario add (+ plate fee spread if brand pays).<br><br>
+          <strong>Landed cost</strong> = Base mfg + Mesh bag + Box + TPE resin + Colorant + Shipping + Scenario add (+ plate fee spread if brand pays).<br><br>
           <strong>Base mfg ($5.09)</strong> — per-pair manufacturing cost including packaging and logo at factory.<br>
           <strong>Mesh bag ($0.56)</strong> — 1 mesh bag per pair. Quote: $0.56/pc (29.5×20.3cm, black or white).<br>
           <strong>Box ($0.60)</strong> — 1 kraft mailer box per pair (conservative). Box $0.34 + sea shipping $0.26 = $0.60 landed. At 2–3 pairs/box, cost drops to $0.20–$0.30/pair.<br>
+          <strong>TPE resin ($1.01)</strong> — 0.388 lbs (Large pair) × $2.60/lb mid-tier Kraiburg TC2GPN. Volume tiers: 1,980 lbs = $2.87/lb, 4,690 lbs = $2.60/lb, 9,920 lbs = $2.42/lb.<br>
           <strong>Colorant</strong> — 0.388 lbs (Large pair weight) × let-down % × $/lb. Default: 4% let-down at $20/lb = $0.31/pair. Range: $12–$20/lb.<br>
           <strong>Shipping ($0.23)</strong> — pallet freight: ~$350/pallet ÷ ~1,500 pairs = $0.23/pair.
         </div>
@@ -410,13 +415,14 @@
     var ok = Math.max(0.01, Math.min(0.99, asNum("mfg-ok", 72) / 100));
     var floor = Math.max(0.01, Math.min(0.99, asNum("mfg-floor", 68) / 100));
 
+    var tpeResin = Math.max(0, asNum("mfg-tpe-resin", 1.01));
     var colorantPerPair = BASE_LBS_LARGE * colorantPct * colorantPerLb;
 
     var scenarioAdd = 0;
     if (scenario === "coop") scenarioAdd = coopAdd;
     if (scenario === "custom") scenarioAdd = coopAdd + customAdd;
 
-    var landedPerUnit = baseCost + shipCost + packaging + box + colorantPerPair + scenarioAdd;
+    var landedPerUnit = baseCost + shipCost + packaging + box + tpeResin + colorantPerPair + scenarioAdd;
     var plateCostApplied = partnerPaysPlate ? 0 : plateFee;
     var platePerUnit = plateCostApplied / qty;
     var landedWithPlatePerUnit = landedPerUnit + platePerUnit;
@@ -468,6 +474,7 @@
     $("mfg-ship-cost").value = "0.23";
     $("mfg-packaging").value = "0.56";
     $("mfg-box").value = "0.60";
+    $("mfg-tpe-resin").value = "1.01";
     $("mfg-colorant-cost").value = "20.00";
     $("mfg-colorant-pct").value = "4";
     $("mfg-coop-add").value = "1.00";
@@ -529,7 +536,7 @@
   gate();
   resetDefaults();
 
-  ["mfg-scenario", "mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-packaging", "mfg-box", "mfg-colorant-cost", "mfg-colorant-pct", "mfg-coop-add", "mfg-custom-add", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
+  ["mfg-scenario", "mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-tpe-resin", "mfg-packaging", "mfg-box", "mfg-colorant-cost", "mfg-colorant-pct", "mfg-coop-add", "mfg-custom-add", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
     .forEach(function (id) {
       $(id).addEventListener("input", function () {
         recalc();
