@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Barreletics Wholesale Pricing — Deal Calculator</title>
+  <title>Wholesale Pricing — Deal Calculator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Serif+Text&display=swap" rel="stylesheet">
@@ -76,7 +76,7 @@
 <div class="br-wholesale-calc">
   <div class="gate-overlay" id="br-gate">
     <div class="gate-box">
-      <h2>Barreletics Wholesale</h2>
+      <h2>Wholesale</h2>
       <p>Enter username and password to access the calculator.</p>
       <input type="text" id="br-gate-user" placeholder="Username" autocomplete="username">
       <input type="password" id="br-gate-pw" placeholder="Password" autocomplete="current-password">
@@ -85,7 +85,7 @@
     </div>
   </div>
   <div class="container" id="br-main-content" style="display:none">
-    <h1>Barreletics Wholesale Pricing</h1>
+    <h1>Wholesale Pricing</h1>
     <p class="subtitle">Deal calculator — adjust inputs, pick tier, see margins. Export for proposals.</p>
     <div class="grid">
       <div class="card">
@@ -216,7 +216,7 @@ document.querySelectorAll('[data-br-toggle="add-tier"]').forEach(function(el){el
 document.querySelectorAll('[data-br-toggle="costs"]').forEach(function(el){el.addEventListener('click',function(){var p=$('br-costs-panel'),t=$('br-costs-toggle');p.classList.toggle('open');t.textContent=p.classList.contains('open')?'▼':'▶';});});
 $('br-reset-costs').addEventListener('click',function(){$('br-baseCost').value=7.75;$('br-coopAdd').value=1;$('br-customAdd').value=1;$('br-shipCost').value=0.73;$('br-msrp').value=74;$('br-sweet').value=78;$('br-ok').value=72;$('br-floor').value=68;recalc();});
 $('br-status-key-btn').addEventListener('click',function(){$('br-status-key').classList.toggle('open');});
-$('br-copy-btn').addEventListener('click',function(){var cat=$('br-category').value,txt=($('br-tier').options[$('br-tier').selectedIndex]||{}).text||'',wp=$('br-res-wp').textContent,pp=$('br-res-partner-pct').textContent,op=$('br-res-our-pct').textContent,q=$('br-qty').value;if(!cat||!txt||wp==='—'){alert('Select category and tier first');return;}var lines=['BARRELECTICS WHOLESALE PRICING','───────────────────────────────','Category: '+cat,'Tier: '+txt,'Order Qty: '+(q||'—'),'Wholesale Price: '+wp,'Partner Margin: '+pp,'Barreletics Net: '+op,'','MSRP: $74'];navigator.clipboard.writeText(lines.join('\n')).then(function(){var b=$('br-copy-btn');var o=b.textContent;b.textContent='Copied!';setTimeout(function(){b.textContent=o;},2000);}).catch(function(){alert('Could not copy');});});
+$('br-copy-btn').addEventListener('click',function(){var cat=$('br-category').value,txt=($('br-tier').options[$('br-tier').selectedIndex]||{}).text||'',wp=$('br-res-wp').textContent,pp=$('br-res-partner-pct').textContent,op=$('br-res-our-pct').textContent,q=$('br-qty').value;if(!cat||!txt||wp==='—'){alert('Select category and tier first');return;}var lines=['WHOLESALE PRICING','───────────────────────────────','Category: '+cat,'Tier: '+txt,'Order Qty: '+(q||'—'),'Wholesale Price: '+wp,'Partner Margin: '+pp,'Brand Net: '+op,'','MSRP: $74'];navigator.clipboard.writeText(lines.join('\n')).then(function(){var b=$('br-copy-btn');var o=b.textContent;b.textContent='Copied!';setTimeout(function(){b.textContent=o;},2000);}).catch(function(){alert('Could not copy');});});
 gate();
 populate();
 buildSummary();
