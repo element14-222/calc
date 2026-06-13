@@ -266,11 +266,11 @@
         <div class="cost-grid" style="margin-top:0.9rem">
           <div class="form-group">
             <label>Base mfg cost ($)</label>
-            <input type="number" id="mfg-base-cost" min="0" step="0.01" value="8.00">
+            <input type="number" id="mfg-base-cost" min="0" step="0.01" value="5.09">
           </div>
           <div class="form-group">
             <label>Shipping ($/unit)</label>
-            <input type="number" id="mfg-ship-cost" min="0" step="0.01" value="0.73">
+            <input type="number" id="mfg-ship-cost" min="0" step="0.01" value="0.23">
           </div>
           <div class="form-group">
             <label>Co-op add ($)</label>
@@ -326,7 +326,8 @@
         </div>
         <div class="formula">
           Brand margin % = (Sell-in price − Landed cost) / Sell-in price. <br>
-          Landed cost = Base + Shipping + Scenario add (+ plate fee spread if brand pays).
+          Landed cost = Base + Shipping + Scenario add (+ plate fee spread if brand pays). <br>
+          Shipping default: ~$350/pallet ÷ ~1,500 pairs = $0.23/pair.
         </div>
       </div>
     </div>
@@ -432,8 +433,8 @@
     $("mfg-qty").value = 500;
     $("mfg-price").value = "32.00";
     $("mfg-msrp").value = "74.00";
-    $("mfg-base-cost").value = "8.00";
-    $("mfg-ship-cost").value = "0.73";
+    $("mfg-base-cost").value = "5.09";
+    $("mfg-ship-cost").value = "0.23";
     $("mfg-coop-add").value = "1.00";
     $("mfg-custom-add").value = "1.00";
     $("mfg-plate-fee").value = "1000";
