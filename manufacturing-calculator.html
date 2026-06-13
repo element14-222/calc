@@ -176,33 +176,6 @@
       border-top: 1px solid var(--border);
       padding-top: 0.8rem;
     }
-    .preset-table-wrap {
-      margin-top: 1.25rem;
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.84rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    th, td {
-      text-align: left;
-      padding: 0.55rem 0.7rem;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-    th {
-      font-size: 0.74rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
-      background: #f7f5f2;
-    }
-    tr:last-child td { border-bottom: none; }
     .gate-overlay {
       position: fixed;
       inset: 0;
@@ -262,10 +235,6 @@
     <div class="grid">
       <div class="card">
         <h2>Inputs</h2>
-        <div class="form-group">
-          <label>Strategy preset</label>
-          <select id="mfg-preset"></select>
-        </div>
         <div class="form-group">
           <label>Scenario</label>
           <select id="mfg-scenario">
@@ -362,19 +331,6 @@
       </div>
     </div>
 
-    <div class="preset-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Preset</th>
-            <th>Scenario</th>
-            <th>MOQ</th>
-            <th>Sell-in price</th>
-          </tr>
-        </thead>
-        <tbody id="mfg-preset-table-body"></tbody>
-      </table>
-    </div>
   </div>
 </div>
 
@@ -382,20 +338,6 @@
 (function () {
   var PASS = "barreletics8";
   var AUTH_KEY = "br_calculators_auth";
-  var PRESETS = [
-    { id: "custom", label: "Custom input", scenario: "stock", qty: 500, price: 32.00, partnerPaysPlate: true },
-    { id: "uo_ref", label: "Current UO rate (300+)", scenario: "stock", qty: 300, price: 37.00, partnerPaysPlate: true },
-    { id: "bb_stock_entry", label: "Big Box Stock — Entry (300+)", scenario: "stock", qty: 300, price: 35.00, partnerPaysPlate: true },
-    { id: "bb_stock_growth", label: "Big Box Stock — Growth (500+)", scenario: "stock", qty: 500, price: 32.00, partnerPaysPlate: true },
-    { id: "bb_stock_strategic", label: "Big Box Stock — Strategic (1000+)", scenario: "stock", qty: 1000, price: 29.60, partnerPaysPlate: true },
-    { id: "bb_coop_entry", label: "Big Box Co-op — Entry (300+)", scenario: "coop", qty: 300, price: 37.00, partnerPaysPlate: true },
-    { id: "bb_coop_growth", label: "Big Box Co-op — Growth (500+)", scenario: "coop", qty: 500, price: 33.30, partnerPaysPlate: true },
-    { id: "bb_coop_strategic", label: "Big Box Co-op — Strategic (1000+)", scenario: "coop", qty: 1000, price: 29.60, partnerPaysPlate: true },
-    { id: "eu_entry", label: "EU Partner — Entry (300+)", scenario: "stock", qty: 300, price: 31.00, partnerPaysPlate: true },
-    { id: "eu_growth", label: "EU Partner — Growth (500+)", scenario: "stock", qty: 500, price: 29.60, partnerPaysPlate: true },
-    { id: "eu_strategic", label: "EU Partner — Strategic (1000+)", scenario: "stock", qty: 1000, price: 28.00, partnerPaysPlate: true }
-  ];
-
   function $(id) { return document.getElementById(id); }
   function asNum(id, fallback) {
     var value = parseFloat($(id).value);
@@ -422,41 +364,6 @@
     if (margin >= okPct) return { label: "OK", cls: "ok" };
     if (margin >= floorPct) return { label: "Floor Risk", cls: "floor" };
     return { label: "NO GO", cls: "nogo" };
-  }
-
-  function populatePresetDropdown() {
-    var select = $("mfg-preset");
-    select.innerHTML = "";
-    PRESETS.forEach(function (preset) {
-      var option = document.createElement("option");
-      option.value = preset.id;
-      option.textContent = preset.label;
-      select.appendChild(option);
-    });
-  }
-
-  function populatePresetTable() {
-    var tbody = $("mfg-preset-table-body");
-    tbody.innerHTML = "";
-    PRESETS.filter(function (preset) { return preset.id !== "custom"; }).forEach(function (preset) {
-      var row = document.createElement("tr");
-      row.innerHTML =
-        "<td>" + preset.label + "</td>" +
-        "<td>" + preset.scenario.toUpperCase() + "</td>" +
-        "<td>" + preset.qty.toLocaleString() + "</td>" +
-        "<td>" + money(preset.price) + "</td>";
-      tbody.appendChild(row);
-    });
-  }
-
-  function applyPreset(presetId) {
-    var preset = PRESETS.find(function (p) { return p.id === presetId; });
-    if (!preset) return;
-    $("mfg-scenario").value = preset.scenario;
-    $("mfg-qty").value = preset.qty;
-    $("mfg-price").value = preset.price.toFixed(2);
-    $("mfg-plate-paid").checked = preset.partnerPaysPlate;
-    recalc();
   }
 
   function recalc() {
@@ -521,7 +428,6 @@
   }
 
   function resetDefaults() {
-    $("mfg-preset").value = "custom";
     $("mfg-scenario").value = "stock";
     $("mfg-qty").value = 500;
     $("mfg-price").value = "32.00";
@@ -539,11 +445,9 @@
   }
 
   function copySummary() {
-    var presetText = $("mfg-preset").options[$("mfg-preset").selectedIndex].textContent;
     var lines = [
       "MANUFACTURING CALCULATOR",
       "────────────────────────────────────",
-      "Preset: " + presetText,
       "Scenario: " + $("mfg-scenario").value.toUpperCase(),
       "Order Qty: " + (asInt("mfg-qty", 0)).toLocaleString(),
       "Sell-in price: " + $("mfg-price").value,
@@ -585,21 +489,16 @@
     });
   }
 
-  populatePresetDropdown();
-  populatePresetTable();
   gate();
   resetDefaults();
 
-  $("mfg-preset").addEventListener("change", function () { applyPreset(this.value); });
   ["mfg-scenario", "mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-coop-add", "mfg-custom-add", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
     .forEach(function (id) {
       $(id).addEventListener("input", function () {
-        if (id !== "mfg-preset") $("mfg-preset").value = "custom";
         recalc();
       });
     });
   $("mfg-plate-paid").addEventListener("change", function () {
-    $("mfg-preset").value = "custom";
     recalc();
   });
   $("mfg-reset-btn").addEventListener("click", resetDefaults);
