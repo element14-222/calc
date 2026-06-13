@@ -255,10 +255,9 @@
       <button type="button" class="btn" id="mfg-gate-btn">Access</button>
     </div>
   </div>
-
   <div class="container" id="mfg-main-content" style="display:none">
     <h1>Manufacturing Calculator</h1>
-    <p class="subtitle">Model unit economics, total gross profit, and required wholesale price for target margins.</p>
+    <p class="subtitle">Model unit economics, total gross profit, and required sell-in price for target margins.</p>
 
     <div class="grid">
       <div class="card">
@@ -281,7 +280,7 @@
             <input type="number" id="mfg-qty" min="1" value="500">
           </div>
           <div class="form-group">
-            <label>Wholesale price ($)</label>
+            <label>Sell-in price ($)</label>
             <input type="number" id="mfg-price" min="0" step="0.01" value="32.00">
           </div>
         </div>
@@ -346,10 +345,10 @@
         <div class="result-row"><span class="label">Total revenue</span><span class="value" id="mfg-res-total-rev">—</span></div>
         <div class="result-row"><span class="label">Total gross profit</span><span class="value" id="mfg-res-total-profit">—</span></div>
         <div class="result-row"><span class="label">Status</span><span class="status empty" id="mfg-res-status">—</span></div>
-        <div class="result-row"><span class="label">Break-even wholesale</span><span class="value" id="mfg-res-break-even">—</span></div>
-        <div class="result-row"><span class="label">Wholesale for Sweet margin</span><span class="value" id="mfg-res-sweet-price">—</span></div>
-        <div class="result-row"><span class="label">Wholesale for OK margin</span><span class="value" id="mfg-res-ok-price">—</span></div>
-        <div class="result-row"><span class="label">Wholesale for Floor margin</span><span class="value" id="mfg-res-floor-price">—</span></div>
+        <div class="result-row"><span class="label">Break-even sell-in price</span><span class="value" id="mfg-res-break-even">—</span></div>
+        <div class="result-row"><span class="label">Price for Sweet margin</span><span class="value" id="mfg-res-sweet-price">—</span></div>
+        <div class="result-row"><span class="label">Price for OK margin</span><span class="value" id="mfg-res-ok-price">—</span></div>
+        <div class="result-row"><span class="label">Price for Floor margin</span><span class="value" id="mfg-res-floor-price">—</span></div>
         <div class="actions">
           <button type="button" class="btn" id="mfg-copy-btn">Copy summary</button>
         </div>
@@ -357,7 +356,7 @@
           <strong>Sweet Spot</strong> = ideal margin, <strong>OK</strong> = negotiation zone, <strong>Floor Risk</strong> = requires strategic justification, <strong>NO GO</strong> = below minimum.
         </div>
         <div class="formula">
-          Brand margin % = (Wholesale − Landed cost) / Wholesale. <br>
+          Brand margin % = (Sell-in price − Landed cost) / Sell-in price. <br>
           Landed cost = Base + Shipping + Scenario add (+ plate fee spread if brand pays).
         </div>
       </div>
@@ -370,7 +369,7 @@
             <th>Preset</th>
             <th>Scenario</th>
             <th>MOQ</th>
-            <th>Wholesale</th>
+            <th>Sell-in price</th>
           </tr>
         </thead>
         <tbody id="mfg-preset-table-body"></tbody>
@@ -547,7 +546,7 @@
       "Preset: " + presetText,
       "Scenario: " + $("mfg-scenario").value.toUpperCase(),
       "Order Qty: " + (asInt("mfg-qty", 0)).toLocaleString(),
-      "Wholesale: " + $("mfg-price").value,
+      "Sell-in price: " + $("mfg-price").value,
       "Landed Cost / Unit: " + $("mfg-res-unit-cost").textContent,
       "Gross Profit / Unit: " + $("mfg-res-profit-unit").textContent,
       "Brand Gross Margin: " + $("mfg-res-margin").textContent,
