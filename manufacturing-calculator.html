@@ -293,6 +293,14 @@
             <input type="number" id="mfg-colorant-pct" min="0" max="100" step="0.1" value="4">
           </div>
           <div class="form-group">
+            <label>3PL handling ($/pair)</label>
+            <input type="number" id="mfg-3pl-handling" min="0" step="0.01" value="1.95">
+          </div>
+          <div class="form-group">
+            <label>Ship to customer ($/pair)</label>
+            <input type="number" id="mfg-3pl-postage" min="0" step="0.01" value="8.20">
+          </div>
+          <div class="form-group">
             <label>Co-op add ($)</label>
             <input type="number" id="mfg-coop-add" min="0" step="0.01" value="1.00">
           </div>
@@ -327,7 +335,8 @@
       <div class="card">
         <h2>Results</h2>
         <div class="result-row"><span class="label">Colorant cost / pair</span><span class="value" id="mfg-res-colorant-pair">—</span></div>
-        <div class="result-row"><span class="label">Landed cost / unit</span><span class="value" id="mfg-res-unit-cost">—</span></div>
+        <div class="result-row"><span class="label">Mfg landed / pair</span><span class="value" id="mfg-res-mfg-landed">—</span></div>
+        <div class="result-row" style="border-top:2px solid var(--accent)"><span class="label"><strong>Fully loaded / pair</strong></span><span class="value" id="mfg-res-unit-cost">—</span></div>
         <div class="result-row"><span class="label">Gross profit / unit</span><span class="value" id="mfg-res-profit-unit">—</span></div>
         <div class="result-row"><span class="label">Brand gross margin %</span><span class="value" id="mfg-res-margin">—</span></div>
         <div class="result-row"><span class="label">Partner margin %</span><span class="value" id="mfg-res-partner-margin">—</span></div>
@@ -347,14 +356,19 @@
         </div>
         <div class="formula">
           <strong>How we calculate</strong><br><br>
-          <strong>Brand margin %</strong> = (Sell-in price − Landed cost) / Sell-in price.<br><br>
-          <strong>Landed cost</strong> = Base mfg + Mesh bag + Box + TPE resin + Colorant + Shipping + Scenario add (+ plate fee spread if brand pays).<br><br>
+          <strong>Brand margin %</strong> = (Sell-in price − Fully loaded cost) / Sell-in price.<br><br>
+          <strong>Mfg landed</strong> = Base mfg + TPE resin + Colorant + Mesh bag + Box + Shipping + Scenario add (+ plate fee spread if brand pays).<br>
+          <strong>Fully loaded</strong> = Mfg landed + 3PL handling + Ship to customer.<br><br>
           <strong>Base mfg ($5.09)</strong> — per-pair manufacturing cost including packaging and logo at factory.<br>
           <strong>Mesh bag ($0.56)</strong> — 1 mesh bag per pair. Quote: $0.56/pc (29.5×20.3cm, black or white).<br>
           <strong>Box ($0.60)</strong> — 1 kraft mailer box per pair (conservative). Box $0.34 + sea shipping $0.26 = $0.60 landed. At 2–3 pairs/box, cost drops to $0.20–$0.30/pair.<br>
           <strong>TPE resin ($1.01)</strong> — 0.388 lbs (Large pair) × $2.60/lb mid-tier Kraiburg TC2GPN. Volume tiers: 1,980 lbs = $2.87/lb, 4,690 lbs = $2.60/lb, 9,920 lbs = $2.42/lb.<br>
           <strong>Colorant</strong> — 0.388 lbs (Large pair weight) × let-down % × $/lb. Default: 4% let-down at $20/lb = $0.31/pair. Range: $12–$20/lb.<br>
-          <strong>Shipping ($0.23)</strong> — pallet freight: ~$350/pallet ÷ ~1,500 pairs = $0.23/pair.
+          <strong>Shipping ($0.23)</strong> — pallet freight: ~$350/pallet ÷ ~1,500 pairs = $0.23/pair.<br><br>
+          <strong>— 3PL Fulfillment (EFS) —</strong><br>
+          <strong>3PL handling ($1.95)</strong> — pick/pack $0.70/item + order processing $1.25/order. Based on EFS invoice Jun 2026.<br>
+          <strong>Ship to customer ($8.20)</strong> — avg postage via USPS Ground Advantage / FedEx SmartPost. Range $7.13–$16.25. Set to $0 if customer pays shipping.<br>
+          <em>Storage (~$14.89/wk) and support ($25/wk) are fixed overhead, not included per-pair.</em>
         </div>
       </div>
     </div>
@@ -407,6 +421,8 @@
     var box = Math.max(0, asNum("mfg-box", 0.60));
     var colorantPerLb = Math.max(0, asNum("mfg-colorant-cost", 20));
     var colorantPct = Math.max(0, Math.min(100, asNum("mfg-colorant-pct", 4))) / 100;
+    var handling3pl = Math.max(0, asNum("mfg-3pl-handling", 1.95));
+    var postage3pl = Math.max(0, asNum("mfg-3pl-postage", 8.20));
     var coopAdd = Math.max(0, asNum("mfg-coop-add", 1));
     var customAdd = Math.max(0, asNum("mfg-custom-add", 1));
     var plateFee = Math.max(0, asNum("mfg-plate-fee", 1000));
@@ -422,27 +438,29 @@
     if (scenario === "coop") scenarioAdd = coopAdd;
     if (scenario === "custom") scenarioAdd = coopAdd + customAdd;
 
-    var landedPerUnit = baseCost + shipCost + packaging + box + tpeResin + colorantPerPair + scenarioAdd;
+    var mfgLandedPerUnit = baseCost + shipCost + packaging + box + tpeResin + colorantPerPair + scenarioAdd;
     var plateCostApplied = partnerPaysPlate ? 0 : plateFee;
     var platePerUnit = plateCostApplied / qty;
-    var landedWithPlatePerUnit = landedPerUnit + platePerUnit;
+    var mfgLandedWithPlate = mfgLandedPerUnit + platePerUnit;
+    var fullyLoadedPerUnit = mfgLandedWithPlate + handling3pl + postage3pl;
 
     var revenuePerUnit = price;
-    var profitPerUnit = revenuePerUnit - landedWithPlatePerUnit;
+    var profitPerUnit = revenuePerUnit - fullyLoadedPerUnit;
     var brandMargin = revenuePerUnit > 0 ? (profitPerUnit / revenuePerUnit) : null;
     var partnerProfit = msrp - price;
     var partnerMargin = msrp > 0 ? (partnerProfit / msrp) : null;
 
-    var totalCost = (landedPerUnit * qty) + plateCostApplied;
+    var totalCost = (fullyLoadedPerUnit * qty);
     var totalRevenue = revenuePerUnit * qty;
     var totalProfit = totalRevenue - totalCost;
-    var breakEven = landedWithPlatePerUnit;
-    var sweetPrice = safeTargetPrice(landedWithPlatePerUnit, sweet);
-    var okPrice = safeTargetPrice(landedWithPlatePerUnit, ok);
-    var floorPrice = safeTargetPrice(landedWithPlatePerUnit, floor);
+    var breakEven = fullyLoadedPerUnit;
+    var sweetPrice = safeTargetPrice(fullyLoadedPerUnit, sweet);
+    var okPrice = safeTargetPrice(fullyLoadedPerUnit, ok);
+    var floorPrice = safeTargetPrice(fullyLoadedPerUnit, floor);
 
     $("mfg-res-colorant-pair").textContent = money(colorantPerPair);
-    $("mfg-res-unit-cost").textContent = money(landedWithPlatePerUnit);
+    $("mfg-res-mfg-landed").textContent = money(mfgLandedWithPlate);
+    $("mfg-res-unit-cost").textContent = money(fullyLoadedPerUnit);
     $("mfg-res-profit-unit").textContent = money(profitPerUnit);
     $("mfg-res-margin").textContent = pct(brandMargin);
     $("mfg-res-partner-margin").textContent = pct(partnerMargin);
@@ -477,6 +495,8 @@
     $("mfg-tpe-resin").value = "1.01";
     $("mfg-colorant-cost").value = "20.00";
     $("mfg-colorant-pct").value = "4";
+    $("mfg-3pl-handling").value = "1.95";
+    $("mfg-3pl-postage").value = "8.20";
     $("mfg-coop-add").value = "1.00";
     $("mfg-custom-add").value = "1.00";
     $("mfg-plate-fee").value = "1000";
@@ -495,7 +515,8 @@
       "Order Qty: " + (asInt("mfg-qty", 0)).toLocaleString(),
       "Sell-in price: " + $("mfg-price").value,
       "Colorant Cost / Pair: " + $("mfg-res-colorant-pair").textContent,
-      "Landed Cost / Unit: " + $("mfg-res-unit-cost").textContent,
+      "Mfg Landed / Pair: " + $("mfg-res-mfg-landed").textContent,
+      "Fully Loaded / Pair: " + $("mfg-res-unit-cost").textContent,
       "Gross Profit / Unit: " + $("mfg-res-profit-unit").textContent,
       "Brand Gross Margin: " + $("mfg-res-margin").textContent,
       "Partner Margin: " + $("mfg-res-partner-margin").textContent,
@@ -536,7 +557,7 @@
   gate();
   resetDefaults();
 
-  ["mfg-scenario", "mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-tpe-resin", "mfg-packaging", "mfg-box", "mfg-colorant-cost", "mfg-colorant-pct", "mfg-coop-add", "mfg-custom-add", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
+  ["mfg-scenario", "mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-tpe-resin", "mfg-packaging", "mfg-box", "mfg-colorant-cost", "mfg-colorant-pct", "mfg-3pl-handling", "mfg-3pl-postage", "mfg-coop-add", "mfg-custom-add", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
     .forEach(function (id) {
       $(id).addEventListener("input", function () {
         recalc();
