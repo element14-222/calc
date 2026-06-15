@@ -230,7 +230,7 @@
   </div>
   <div class="container" id="mfg-main-content" style="display:none">
     <h1>Manufacturing Calculator</h1>
-    <p class="subtitle">Model unit economics, total gross profit, and required sell-in price for target margins.</p>
+    <p class="subtitle">Per-pair cost breakdown for manufacturing, packaging, and fulfillment.</p>
 
     <div class="grid">
       <div class="card">
@@ -238,17 +238,7 @@
         <div class="inline-row">
           <div class="form-group">
             <label>Order quantity</label>
-            <input type="number" id="mfg-qty" min="1" value="500">
-          </div>
-          <div class="form-group">
-            <label>Sell-in price ($)</label>
-            <input type="number" id="mfg-price" min="0" step="0.01" value="32.00">
-          </div>
-        </div>
-        <div class="inline-row" style="margin-top:0.9rem">
-          <div class="form-group">
-            <label>MSRP ($)</label>
-            <input type="number" id="mfg-msrp" min="0" step="0.01" value="74.00">
+            <input type="number" id="mfg-qty" min="1" value="1500">
           </div>
           <div class="form-group">
             <label>One-time plate fee ($)</label>
@@ -297,61 +287,46 @@
           <input type="checkbox" id="mfg-plate-paid" checked>
           <label for="mfg-plate-paid" style="margin:0">Partner pays one-time plate fee</label>
         </div>
-        <div class="cost-grid" style="margin-top:0.9rem">
-          <div class="form-group">
-            <label>Sweet margin %</label>
-            <input type="number" id="mfg-sweet" min="1" max="99" step="0.1" value="78">
-          </div>
-          <div class="form-group">
-            <label>OK margin %</label>
-            <input type="number" id="mfg-ok" min="1" max="99" step="0.1" value="72">
-          </div>
-          <div class="form-group">
-            <label>Floor margin %</label>
-            <input type="number" id="mfg-floor" min="1" max="99" step="0.1" value="68">
-          </div>
-        </div>
         <div class="actions">
           <button type="button" class="btn secondary" id="mfg-reset-btn">Reset defaults</button>
         </div>
       </div>
 
       <div class="card">
-        <h2>Results</h2>
-        <div class="result-row"><span class="label">Colorant cost / pair</span><span class="value" id="mfg-res-colorant-pair">—</span></div>
-        <div class="result-row"><span class="label">Mfg landed / pair</span><span class="value" id="mfg-res-mfg-landed">—</span></div>
-        <div class="result-row" style="border-top:2px solid var(--accent)"><span class="label"><strong>Fully loaded / pair</strong></span><span class="value" id="mfg-res-unit-cost">—</span></div>
-        <div class="result-row"><span class="label">Gross profit / unit</span><span class="value" id="mfg-res-profit-unit">—</span></div>
-        <div class="result-row"><span class="label">Brand gross margin %</span><span class="value" id="mfg-res-margin">—</span></div>
-        <div class="result-row"><span class="label">Partner margin %</span><span class="value" id="mfg-res-partner-margin">—</span></div>
-        <div class="result-row"><span class="label">Total COGS</span><span class="value" id="mfg-res-total-cost">—</span></div>
-        <div class="result-row"><span class="label">Total revenue</span><span class="value" id="mfg-res-total-rev">—</span></div>
-        <div class="result-row"><span class="label">Total gross profit</span><span class="value" id="mfg-res-total-profit">—</span></div>
-        <div class="result-row"><span class="label">Status</span><span class="status empty" id="mfg-res-status">—</span></div>
-        <div class="result-row"><span class="label">Break-even sell-in price</span><span class="value" id="mfg-res-break-even">—</span></div>
-        <div class="result-row"><span class="label">Price for Sweet margin</span><span class="value" id="mfg-res-sweet-price">—</span></div>
-        <div class="result-row"><span class="label">Price for OK margin</span><span class="value" id="mfg-res-ok-price">—</span></div>
-        <div class="result-row"><span class="label">Price for Floor margin</span><span class="value" id="mfg-res-floor-price">—</span></div>
+        <h2>Cost per pair</h2>
+        <div class="result-row"><span class="label">Base mfg</span><span class="value" id="mfg-res-base">—</span></div>
+        <div class="result-row"><span class="label">TPE resin</span><span class="value" id="mfg-res-tpe">—</span></div>
+        <div class="result-row"><span class="label">Colorant</span><span class="value" id="mfg-res-colorant-pair">—</span></div>
+        <div class="result-row"><span class="label">Mesh bag</span><span class="value" id="mfg-res-mesh">—</span></div>
+        <div class="result-row"><span class="label">Box</span><span class="value" id="mfg-res-box">—</span></div>
+        <div class="result-row"><span class="label">Pallet freight</span><span class="value" id="mfg-res-ship">—</span></div>
+        <div class="result-row"><span class="label">Plate fee / pair</span><span class="value" id="mfg-res-plate">—</span></div>
+        <div class="result-row" style="border-top:2px solid var(--accent)"><span class="label"><strong>Mfg landed / pair</strong></span><span class="value" id="mfg-res-mfg-landed">—</span></div>
+        <div class="result-row" style="margin-top:0.5rem"><span class="label">3PL handling</span><span class="value" id="mfg-res-3pl">—</span></div>
+        <div class="result-row"><span class="label">Ship to customer</span><span class="value" id="mfg-res-postage">—</span></div>
+        <div class="result-row" style="border-top:2px solid var(--accent)"><span class="label"><strong>Fully loaded / pair</strong></span><span class="value" id="mfg-res-fully-loaded">—</span></div>
+
+        <h2 style="margin-top:1.25rem">Order totals</h2>
+        <div class="result-row"><span class="label">Total mfg cost</span><span class="value" id="mfg-res-total-mfg">—</span></div>
+        <div class="result-row"><span class="label">Total fully loaded</span><span class="value" id="mfg-res-total-loaded">—</span></div>
+        <div class="result-row"><span class="label">Plate fee</span><span class="value" id="mfg-res-total-plate">—</span></div>
+
         <div class="actions">
           <button type="button" class="btn" id="mfg-copy-btn">Copy summary</button>
         </div>
-        <div class="key">
-          <strong>Sweet Spot</strong> = ideal margin, <strong>OK</strong> = negotiation zone, <strong>Floor Risk</strong> = requires strategic justification, <strong>NO GO</strong> = below minimum.
-        </div>
         <div class="formula">
           <strong>How we calculate</strong><br><br>
-          <strong>Brand margin %</strong> = (Sell-in price − Fully loaded cost) / Sell-in price.<br><br>
-          <strong>Mfg landed</strong> = Base mfg + TPE resin + Colorant + Mesh bag + Box + Shipping (+ plate fee spread if brand pays).<br>
+          <strong>Mfg landed</strong> = Base mfg + TPE resin + Colorant + Mesh bag + Box + Pallet freight (+ plate fee/pair if brand pays).<br>
           <strong>Fully loaded</strong> = Mfg landed + 3PL handling + Ship to customer.<br><br>
-          <strong>Base mfg ($5.09)</strong> — per-pair manufacturing cost including packaging and logo at factory.<br>
-          <strong>Mesh bag ($0.56)</strong> — 1 mesh bag per pair. Quote: $0.56/pc (29.5×20.3cm, black or white).<br>
-          <strong>Box ($0.60)</strong> — 1 kraft mailer box per pair (conservative). Box $0.34 + sea shipping $0.26 = $0.60 landed. At 2–3 pairs/box, cost drops to $0.20–$0.30/pair.<br>
-          <strong>TPE resin ($1.01)</strong> — 0.388 lbs (Large pair) × $2.60/lb mid-tier Kraiburg TC2GPN. Volume tiers: 1,980 lbs = $2.87/lb, 4,690 lbs = $2.60/lb, 9,920 lbs = $2.42/lb.<br>
-          <strong>Colorant</strong> — 0.388 lbs (Large pair weight) × let-down % × $/lb. Default: 4% let-down at $20/lb = $0.31/pair. Range: $12–$20/lb.<br>
-          <strong>Shipping ($0.23)</strong> — pallet freight: ~$350/pallet ÷ ~1,500 pairs = $0.23/pair.<br><br>
+          <strong>Base mfg ($5.09)</strong> — per-pair cost including packaging and logo at factory.<br>
+          <strong>TPE resin ($1.01)</strong> — 0.388 lbs (Large pair) × $2.60/lb mid-tier Kraiburg TC2GPN. Tiers: 1,980 lbs = $2.87, 4,690 lbs = $2.60, 9,920 lbs = $2.42.<br>
+          <strong>Colorant ($0.31)</strong> — 0.388 lbs × let-down % × $/lb. Default: 4% at $20/lb. Range: $12–$20/lb.<br>
+          <strong>Mesh bag ($0.56)</strong> — 1 per pair. Quote: $0.56/pc (29.5×20.3cm).<br>
+          <strong>Box ($0.60)</strong> — 1 kraft mailer per pair (conservative). At 2–3 pairs/box: $0.20–$0.30.<br>
+          <strong>Pallet freight ($0.23)</strong> — ~$350/pallet ÷ ~1,500 pairs.<br><br>
           <strong>— 3PL Fulfillment (EFS) —</strong><br>
-          <strong>3PL handling ($1.95)</strong> — pick/pack $0.70/item + order processing $1.25/order. Based on EFS invoice Jun 2026.<br>
-          <strong>Ship to customer ($8.20)</strong> — avg postage via USPS Ground Advantage / FedEx SmartPost. Range $7.13–$16.25. Set to $0 if customer pays shipping.<br>
+          <strong>3PL handling ($1.95)</strong> — pick/pack $0.70 + order processing $1.25. Per EFS invoice Jun 2026.<br>
+          <strong>Ship to customer ($8.20)</strong> — avg USPS/FedEx postage. Range $7.13–$16.25. Set $0 if customer pays.<br>
           <em>Storage (~$14.89/wk) and support ($25/wk) are fixed overhead, not included per-pair.</em>
         </div>
       </div>
@@ -377,93 +352,48 @@
     if (n == null || isNaN(n)) return "—";
     return "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
-  function pct(n) {
-    if (n == null || isNaN(n)) return "—";
-    return (Number(n) * 100).toFixed(1) + "%";
-  }
-  function safeTargetPrice(landedPerUnit, targetPct) {
-    if (targetPct >= 0.999) return null;
-    return landedPerUnit / (1 - targetPct);
-  }
-  function statusFor(margin, sweetPct, okPct, floorPct) {
-    if (margin >= sweetPct) return { label: "Sweet Spot", cls: "sweet" };
-    if (margin >= okPct) return { label: "OK", cls: "ok" };
-    if (margin >= floorPct) return { label: "Floor Risk", cls: "floor" };
-    return { label: "NO GO", cls: "nogo" };
-  }
-
   var BASE_LBS_LARGE = 0.388;
 
   function recalc() {
     var qty = Math.max(1, asInt("mfg-qty", 1));
-    var price = Math.max(0, asNum("mfg-price", 0));
-    var msrp = Math.max(0, asNum("mfg-msrp", 74));
     var baseCost = Math.max(0, asNum("mfg-base-cost", 5.09));
     var shipCost = Math.max(0, asNum("mfg-ship-cost", 0.23));
     var packaging = Math.max(0, asNum("mfg-packaging", 0.56));
     var box = Math.max(0, asNum("mfg-box", 0.60));
+    var tpeResin = Math.max(0, asNum("mfg-tpe-resin", 1.01));
     var colorantPerLb = Math.max(0, asNum("mfg-colorant-cost", 20));
     var colorantPct = Math.max(0, Math.min(100, asNum("mfg-colorant-pct", 4))) / 100;
     var handling3pl = Math.max(0, asNum("mfg-3pl-handling", 1.95));
     var postage3pl = Math.max(0, asNum("mfg-3pl-postage", 8.20));
     var plateFee = Math.max(0, asNum("mfg-plate-fee", 1000));
     var partnerPaysPlate = $("mfg-plate-paid").checked;
-    var sweet = Math.max(0.01, Math.min(0.99, asNum("mfg-sweet", 78) / 100));
-    var ok = Math.max(0.01, Math.min(0.99, asNum("mfg-ok", 72) / 100));
-    var floor = Math.max(0.01, Math.min(0.99, asNum("mfg-floor", 68) / 100));
 
-    var tpeResin = Math.max(0, asNum("mfg-tpe-resin", 1.01));
     var colorantPerPair = BASE_LBS_LARGE * colorantPct * colorantPerLb;
-
-    var mfgLandedPerUnit = baseCost + shipCost + packaging + box + tpeResin + colorantPerPair;
     var plateCostApplied = partnerPaysPlate ? 0 : plateFee;
     var platePerUnit = plateCostApplied / qty;
-    var mfgLandedWithPlate = mfgLandedPerUnit + platePerUnit;
-    var fullyLoadedPerUnit = mfgLandedWithPlate + handling3pl + postage3pl;
 
-    var revenuePerUnit = price;
-    var profitPerUnit = revenuePerUnit - fullyLoadedPerUnit;
-    var brandMargin = revenuePerUnit > 0 ? (profitPerUnit / revenuePerUnit) : null;
-    var partnerProfit = msrp - price;
-    var partnerMargin = msrp > 0 ? (partnerProfit / msrp) : null;
+    var mfgLandedPerUnit = baseCost + tpeResin + colorantPerPair + packaging + box + shipCost + platePerUnit;
+    var fullyLoadedPerUnit = mfgLandedPerUnit + handling3pl + postage3pl;
 
-    var totalCost = (fullyLoadedPerUnit * qty);
-    var totalRevenue = revenuePerUnit * qty;
-    var totalProfit = totalRevenue - totalCost;
-    var breakEven = fullyLoadedPerUnit;
-    var sweetPrice = safeTargetPrice(fullyLoadedPerUnit, sweet);
-    var okPrice = safeTargetPrice(fullyLoadedPerUnit, ok);
-    var floorPrice = safeTargetPrice(fullyLoadedPerUnit, floor);
-
+    $("mfg-res-base").textContent = money(baseCost);
+    $("mfg-res-tpe").textContent = money(tpeResin);
     $("mfg-res-colorant-pair").textContent = money(colorantPerPair);
-    $("mfg-res-mfg-landed").textContent = money(mfgLandedWithPlate);
-    $("mfg-res-unit-cost").textContent = money(fullyLoadedPerUnit);
-    $("mfg-res-profit-unit").textContent = money(profitPerUnit);
-    $("mfg-res-margin").textContent = pct(brandMargin);
-    $("mfg-res-partner-margin").textContent = pct(partnerMargin);
-    $("mfg-res-total-cost").textContent = money(totalCost);
-    $("mfg-res-total-rev").textContent = money(totalRevenue);
-    $("mfg-res-total-profit").textContent = money(totalProfit);
-    $("mfg-res-break-even").textContent = money(breakEven);
-    $("mfg-res-sweet-price").textContent = money(sweetPrice);
-    $("mfg-res-ok-price").textContent = money(okPrice);
-    $("mfg-res-floor-price").textContent = money(floorPrice);
+    $("mfg-res-mesh").textContent = money(packaging);
+    $("mfg-res-box").textContent = money(box);
+    $("mfg-res-ship").textContent = money(shipCost);
+    $("mfg-res-plate").textContent = money(platePerUnit);
+    $("mfg-res-mfg-landed").textContent = money(mfgLandedPerUnit);
+    $("mfg-res-3pl").textContent = money(handling3pl);
+    $("mfg-res-postage").textContent = money(postage3pl);
+    $("mfg-res-fully-loaded").textContent = money(fullyLoadedPerUnit);
 
-    var statusEl = $("mfg-res-status");
-    if (brandMargin == null) {
-      statusEl.className = "status empty";
-      statusEl.textContent = "—";
-    } else {
-      var status = statusFor(brandMargin, sweet, ok, floor);
-      statusEl.className = "status " + status.cls;
-      statusEl.textContent = status.label;
-    }
+    $("mfg-res-total-mfg").textContent = money(mfgLandedPerUnit * qty);
+    $("mfg-res-total-loaded").textContent = money(fullyLoadedPerUnit * qty);
+    $("mfg-res-total-plate").textContent = money(plateCostApplied);
   }
 
   function resetDefaults() {
-    $("mfg-qty").value = 500;
-    $("mfg-price").value = "32.00";
-    $("mfg-msrp").value = "74.00";
+    $("mfg-qty").value = 1500;
     $("mfg-base-cost").value = "5.09";
     $("mfg-ship-cost").value = "0.23";
     $("mfg-packaging").value = "0.56";
@@ -475,26 +405,32 @@
     $("mfg-3pl-postage").value = "8.20";
     $("mfg-plate-fee").value = "1000";
     $("mfg-plate-paid").checked = true;
-    $("mfg-sweet").value = "78";
-    $("mfg-ok").value = "72";
-    $("mfg-floor").value = "68";
     recalc();
   }
 
   function copySummary() {
     var lines = [
-      "MANUFACTURING CALCULATOR",
+      "MANUFACTURING COST CALCULATOR",
       "────────────────────────────────────",
       "Order Qty: " + (asInt("mfg-qty", 0)).toLocaleString(),
-      "Sell-in price: " + $("mfg-price").value,
-      "Colorant Cost / Pair: " + $("mfg-res-colorant-pair").textContent,
-      "Mfg Landed / Pair: " + $("mfg-res-mfg-landed").textContent,
-      "Fully Loaded / Pair: " + $("mfg-res-unit-cost").textContent,
-      "Gross Profit / Unit: " + $("mfg-res-profit-unit").textContent,
-      "Brand Gross Margin: " + $("mfg-res-margin").textContent,
-      "Partner Margin: " + $("mfg-res-partner-margin").textContent,
-      "Total Gross Profit: " + $("mfg-res-total-profit").textContent,
-      "Status: " + $("mfg-res-status").textContent
+      "",
+      "COST PER PAIR",
+      "Base mfg: " + $("mfg-res-base").textContent,
+      "TPE resin: " + $("mfg-res-tpe").textContent,
+      "Colorant: " + $("mfg-res-colorant-pair").textContent,
+      "Mesh bag: " + $("mfg-res-mesh").textContent,
+      "Box: " + $("mfg-res-box").textContent,
+      "Pallet freight: " + $("mfg-res-ship").textContent,
+      "Plate fee/pair: " + $("mfg-res-plate").textContent,
+      "MFG LANDED: " + $("mfg-res-mfg-landed").textContent,
+      "",
+      "3PL handling: " + $("mfg-res-3pl").textContent,
+      "Ship to customer: " + $("mfg-res-postage").textContent,
+      "FULLY LOADED: " + $("mfg-res-fully-loaded").textContent,
+      "",
+      "ORDER TOTALS",
+      "Total mfg cost: " + $("mfg-res-total-mfg").textContent,
+      "Total fully loaded: " + $("mfg-res-total-loaded").textContent
     ];
     navigator.clipboard.writeText(lines.join("\n")).then(function () {
       var btn = $("mfg-copy-btn");
@@ -530,7 +466,7 @@
   gate();
   resetDefaults();
 
-  ["mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-tpe-resin", "mfg-packaging", "mfg-box", "mfg-colorant-cost", "mfg-colorant-pct", "mfg-3pl-handling", "mfg-3pl-postage", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
+  ["mfg-qty", "mfg-base-cost", "mfg-ship-cost", "mfg-tpe-resin", "mfg-packaging", "mfg-box", "mfg-colorant-cost", "mfg-colorant-pct", "mfg-3pl-handling", "mfg-3pl-postage", "mfg-plate-fee"]
     .forEach(function (id) {
       $(id).addEventListener("input", function () {
         recalc();
