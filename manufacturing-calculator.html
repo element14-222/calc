@@ -235,14 +235,6 @@
     <div class="grid">
       <div class="card">
         <h2>Inputs</h2>
-        <div class="form-group">
-          <label>Scenario</label>
-          <select id="mfg-scenario">
-            <option value="stock">Stock</option>
-            <option value="coop">Co-op</option>
-            <option value="custom">Custom</option>
-          </select>
-        </div>
         <div class="inline-row">
           <div class="form-group">
             <label>Order quantity</label>
@@ -300,14 +292,6 @@
             <label>Ship to customer ($/pair)</label>
             <input type="number" id="mfg-3pl-postage" min="0" step="0.01" value="8.20">
           </div>
-          <div class="form-group">
-            <label>Co-op add ($)</label>
-            <input type="number" id="mfg-coop-add" min="0" step="0.01" value="1.00">
-          </div>
-          <div class="form-group">
-            <label>Custom add ($)</label>
-            <input type="number" id="mfg-custom-add" min="0" step="0.01" value="1.00">
-          </div>
         </div>
         <div class="checkbox-row">
           <input type="checkbox" id="mfg-plate-paid" checked>
@@ -357,7 +341,7 @@
         <div class="formula">
           <strong>How we calculate</strong><br><br>
           <strong>Brand margin %</strong> = (Sell-in price − Fully loaded cost) / Sell-in price.<br><br>
-          <strong>Mfg landed</strong> = Base mfg + TPE resin + Colorant + Mesh bag + Box + Shipping + Scenario add (+ plate fee spread if brand pays).<br>
+          <strong>Mfg landed</strong> = Base mfg + TPE resin + Colorant + Mesh bag + Box + Shipping (+ plate fee spread if brand pays).<br>
           <strong>Fully loaded</strong> = Mfg landed + 3PL handling + Ship to customer.<br><br>
           <strong>Base mfg ($5.09)</strong> — per-pair manufacturing cost including packaging and logo at factory.<br>
           <strong>Mesh bag ($0.56)</strong> — 1 mesh bag per pair. Quote: $0.56/pc (29.5×20.3cm, black or white).<br>
@@ -411,7 +395,6 @@
   var BASE_LBS_LARGE = 0.388;
 
   function recalc() {
-    var scenario = $("mfg-scenario").value;
     var qty = Math.max(1, asInt("mfg-qty", 1));
     var price = Math.max(0, asNum("mfg-price", 0));
     var msrp = Math.max(0, asNum("mfg-msrp", 74));
@@ -423,8 +406,6 @@
     var colorantPct = Math.max(0, Math.min(100, asNum("mfg-colorant-pct", 4))) / 100;
     var handling3pl = Math.max(0, asNum("mfg-3pl-handling", 1.95));
     var postage3pl = Math.max(0, asNum("mfg-3pl-postage", 8.20));
-    var coopAdd = Math.max(0, asNum("mfg-coop-add", 1));
-    var customAdd = Math.max(0, asNum("mfg-custom-add", 1));
     var plateFee = Math.max(0, asNum("mfg-plate-fee", 1000));
     var partnerPaysPlate = $("mfg-plate-paid").checked;
     var sweet = Math.max(0.01, Math.min(0.99, asNum("mfg-sweet", 78) / 100));
@@ -434,11 +415,7 @@
     var tpeResin = Math.max(0, asNum("mfg-tpe-resin", 1.01));
     var colorantPerPair = BASE_LBS_LARGE * colorantPct * colorantPerLb;
 
-    var scenarioAdd = 0;
-    if (scenario === "coop") scenarioAdd = coopAdd;
-    if (scenario === "custom") scenarioAdd = coopAdd + customAdd;
-
-    var mfgLandedPerUnit = baseCost + shipCost + packaging + box + tpeResin + colorantPerPair + scenarioAdd;
+    var mfgLandedPerUnit = baseCost + shipCost + packaging + box + tpeResin + colorantPerPair;
     var plateCostApplied = partnerPaysPlate ? 0 : plateFee;
     var platePerUnit = plateCostApplied / qty;
     var mfgLandedWithPlate = mfgLandedPerUnit + platePerUnit;
@@ -484,7 +461,6 @@
   }
 
   function resetDefaults() {
-    $("mfg-scenario").value = "stock";
     $("mfg-qty").value = 500;
     $("mfg-price").value = "32.00";
     $("mfg-msrp").value = "74.00";
@@ -497,8 +473,6 @@
     $("mfg-colorant-pct").value = "4";
     $("mfg-3pl-handling").value = "1.95";
     $("mfg-3pl-postage").value = "8.20";
-    $("mfg-coop-add").value = "1.00";
-    $("mfg-custom-add").value = "1.00";
     $("mfg-plate-fee").value = "1000";
     $("mfg-plate-paid").checked = true;
     $("mfg-sweet").value = "78";
@@ -511,7 +485,6 @@
     var lines = [
       "MANUFACTURING CALCULATOR",
       "────────────────────────────────────",
-      "Scenario: " + $("mfg-scenario").value.toUpperCase(),
       "Order Qty: " + (asInt("mfg-qty", 0)).toLocaleString(),
       "Sell-in price: " + $("mfg-price").value,
       "Colorant Cost / Pair: " + $("mfg-res-colorant-pair").textContent,
@@ -557,7 +530,7 @@
   gate();
   resetDefaults();
 
-  ["mfg-scenario", "mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-tpe-resin", "mfg-packaging", "mfg-box", "mfg-colorant-cost", "mfg-colorant-pct", "mfg-3pl-handling", "mfg-3pl-postage", "mfg-coop-add", "mfg-custom-add", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
+  ["mfg-qty", "mfg-price", "mfg-msrp", "mfg-base-cost", "mfg-ship-cost", "mfg-tpe-resin", "mfg-packaging", "mfg-box", "mfg-colorant-cost", "mfg-colorant-pct", "mfg-3pl-handling", "mfg-3pl-postage", "mfg-plate-fee", "mfg-sweet", "mfg-ok", "mfg-floor"]
     .forEach(function (id) {
       $(id).addEventListener("input", function () {
         recalc();
